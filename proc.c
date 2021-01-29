@@ -532,3 +532,11 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+int
+getparentid(void)
+{
+  struct proc *curproc = myproc();
+  int chlid_pid = curproc->parent->pid;
+  return chlid_pid;
+}
