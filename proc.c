@@ -540,3 +540,21 @@ getparentid(void)
   int chlid_pid = curproc->parent->pid;
   return chlid_pid;
 }
+
+int
+getChildren(char * ptr)
+{
+  struct proc *curproc = myproc();
+  struct proc *p;
+  int i = 0;
+
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  {
+    if(p->parent == curproc)
+    { 
+      ptr[i] = p->pid;
+      i++; 
+    }
+  }
+  return 1;
+}

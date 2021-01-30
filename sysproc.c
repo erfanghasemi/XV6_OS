@@ -95,3 +95,15 @@ sys_getparentid(void)
 {
   return getparentid();
 }
+
+int
+sys_getChildren(void)
+{
+  char * ptr;
+
+  if(argptr(0, &ptr, 4) < 0)
+    return -1;
+
+  getChildren(ptr);
+  return 1;
+}
