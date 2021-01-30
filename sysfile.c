@@ -421,7 +421,7 @@ sys_exec(void)
 
 int
 sys_pipe(void)
-{
+{ 
   int *fd;
   struct file *rf, *wf;
   int fd0, fd1;

@@ -533,6 +533,7 @@ procdump(void)
   }
 }
 
+// return parent ID of a process (Added)
 int
 getparentid(void)
 {
@@ -541,6 +542,7 @@ getparentid(void)
   return chlid_pid;
 }
 
+// return children ID of a process (Added)
 int
 getChildren(char * ptr)
 {
@@ -557,4 +559,15 @@ getChildren(char * ptr)
     }
   }
   return 1;
+}
+
+// return occurrence of a syscall for current process (Added)
+int
+getSyscallCounter(int syscallNo){
+
+  struct proc *curproc = myproc();
+  int occurrence;
+
+  occurrence = curproc->syscall_occurrence[syscallNo-1];
+  return occurrence;
 }

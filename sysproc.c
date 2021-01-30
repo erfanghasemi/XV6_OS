@@ -15,7 +15,7 @@ sys_fork(void)
 
 int
 sys_exit(void)
-{
+{ 
   exit();
   return 0;  // not reached
 }
@@ -28,8 +28,8 @@ sys_wait(void)
 
 int
 sys_kill(void)
-{
-  int pid;
+{ 
+ int pid;
 
   if(argint(0, &pid) < 0)
     return -1;
@@ -38,13 +38,13 @@ sys_kill(void)
 
 int
 sys_getpid(void)
-{
+{ 
   return myproc()->pid;
 }
 
 int
 sys_sbrk(void)
-{
+{ 
   int addr;
   int n;
 
@@ -81,7 +81,7 @@ sys_sleep(void)
 // since start.
 int
 sys_uptime(void)
-{
+{ 
   uint xticks;
 
   acquire(&tickslock);
@@ -90,12 +90,14 @@ sys_uptime(void)
   return xticks;
 }
 
+// return parent ID of a process (Added)
 int
 sys_getparentid(void)
 {
   return getparentid();
 }
 
+// return children ID of a process (Added)
 int
 sys_getChildren(void)
 {
@@ -106,4 +108,16 @@ sys_getChildren(void)
 
   getChildren(ptr);
   return 1;
+}
+
+// return occurrence of a syscall for current process (Added)
+int
+sys_getSyscallCounter()
+{
+  int syscallNo;
+
+  if(argint(0, &syscallNo) < 0)
+    return -1;
+
+  return getSyscallCounter(syscallNo);
 }
