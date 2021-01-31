@@ -92,6 +92,10 @@ sys_uptime(void)
   return xticks;
 }
 
+
+///////////////////ADDED SYSCALLS///////////////////
+
+
 // return parent ID of a process (Added)
 int
 sys_getparentid(void)

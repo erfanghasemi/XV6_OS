@@ -19,6 +19,7 @@ int nextpid = 1;
 extern void forkret(void);
 extern void trapret(void);
 
+int exec_process(struct proc* p, struct cpu* c);    // (Added)
 static void wakeup1(void *chan);
 
 void
@@ -322,39 +323,45 @@ wait(void)
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
-void
+void                                          // (Modified)
 scheduler(void)
 {
-  struct proc *p;
+  struct proc *p = 0;                         // (Modified)
   struct cpu *c = mycpu();
   c->proc = 0;
-  
+  extern int curPolicy;
+
   for(;;){
     // Enable interrupts on this processor.
     sti();
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state != RUNNABLE)
-        continue;
+    switch (curPolicy)
+    {
+    case 0:       // Default
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->state != RUNNABLE)
+          continue;
+        exec_process(p, c);
+      }
+      break;
+    
+    case 1:       // Priority queues
 
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
-      c->proc = p;
-      switchuvm(p);
-      p->state = RUNNING;
+      break;
 
-      swtch(&(c->scheduler), p->context);
-      switchkvm();
+    case 2:       // Reverse priority queues
+      break;
 
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      c->proc = 0;
+    case 3:       // Round-Robin
+      break;
+
+    case 4:       // Multy layer Queue
+      break;
     }
-    release(&ptable.lock);
 
+    release(&ptable.lock);
   }
 }
 
@@ -535,6 +542,33 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+
+///////////////////METHODS///////////////////
+
+// excute selected process on cpu
+int
+exec_process(struct proc* p, struct cpu* c){
+  // // Switch to chosen process.  It is the process's job
+  // // to release ptable.lock and then reacquire it
+  // // before jumping back to us.
+
+  c->proc = p;
+  switchuvm(p);
+  p->state = RUNNING;
+
+  swtch(&(c->scheduler), p->context);
+  switchkvm();
+
+  // // Process is done running for now.
+  // // It should have changed its p->state before coming back.
+  c->proc = 0;
+  return 1;
+}
+
+
+///////////////////ADDED SYSCALLS///////////////////
+
 
 // return parent ID of a process (Added)
 int
