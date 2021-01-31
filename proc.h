@@ -10,6 +10,7 @@ struct cpu {
   struct proc *proc;           // The process running on this cpu or null
 };
 
+int curPolicy;                  // shows that current scheduling policy (Added)
 extern struct cpu cpus[NCPU];
 extern int ncpu;
 

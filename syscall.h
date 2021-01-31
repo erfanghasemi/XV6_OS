@@ -25,3 +25,5 @@
 #define SYS_getSyscallCounter 24        // (Added)
 #define SYS_setPriority 25              // (Added)
 #define SYS_getPriority 26              // (Added)
+#define SYS_changePolicy 27             // (Added)
+#define SYS_getPolicy 28                // (Added)

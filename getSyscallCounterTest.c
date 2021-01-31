@@ -18,7 +18,7 @@ int main(void)
         for (int i = 0; i < 16; i++)
             getpid();
 
-        printf(1, "child sys_getpid count %d\n", getSyscallCounter(11));
+        printf(1, "Child sys_getpid count %d\n", getSyscallCounter(11));
     }
     else
     {

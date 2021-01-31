@@ -108,6 +108,8 @@ extern int sys_getChildren(void);           // (Added)
 extern int sys_getSyscallCounter(void);     // (Added)
 extern int sys_setPriority(void);           // (Added)
 extern int sys_getPriority(void);           // (Added)
+extern int sys_changePolicy(void);          // (Added)
+extern int sys_getPolicy(void);             // (Added)
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -135,7 +137,9 @@ static int (*syscalls[])(void) = {
 [SYS_getChildren]  sys_getChildren,               // (Added)
 [SYS_getSyscallCounter]  sys_getSyscallCounter,   // (Added)
 [SYS_setPriority]     sys_setPriority,            // (Added)
-[SYS_getPriority]     sys_getPriority             // (Added)
+[SYS_getPriority]     sys_getPriority,            // (Added)
+[SYS_changePolicy]    sys_changePolicy,           // (Added)
+[SYS_getPolicy]       sys_getPolicy               // (Added) 
 };
 
 void

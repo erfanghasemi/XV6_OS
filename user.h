@@ -28,6 +28,8 @@ int getChildren(char* ptr);              // (Added)
 int getSyscallCounter(int syscallNo);    // (Added)
 int setPriority(int priority);           // (Added)
 int getPriority(void);                   // (Added)
+int changePolicy(int policy);            // (Added)
+int getPolicy(void);                     // (Added)
 
 // ulib.c
 int stat(const char*, struct stat*);

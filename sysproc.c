@@ -7,6 +7,8 @@
 #include "mmu.h"
 #include "proc.h"
 
+extern int curPolicy;                  // shows that current scheduling policy (Added)
+
 int
 sys_fork(void)
 {
@@ -139,4 +141,22 @@ int
 sys_getPriority(void)
 {
   return getPriority();
+}
+
+// change scheduling policy (Added)
+int
+sys_changePolicy(void)
+{
+  int policy;
+  if(argint(0, &policy) < 0)
+    return -1;
+  curPolicy = policy;
+  return 1;
+}
+
+// return scheduling policy (Added)
+int
+sys_getPolicy(void)
+{
+  return curPolicy;
 }
