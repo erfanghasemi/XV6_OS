@@ -121,3 +121,22 @@ sys_getSyscallCounter()
 
   return getSyscallCounter(syscallNo);
 }
+
+// set or modify priority of current process (Added)
+int
+sys_setPriority(void)
+{
+  int priority;
+
+  if(argint(0, &priority) < 0)
+    return -1;
+
+  return setPriority(priority);
+}
+
+// return priority of current process (Added)
+int
+sys_getPriority(void)
+{
+  return getPriority();
+}

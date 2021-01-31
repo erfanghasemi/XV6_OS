@@ -184,6 +184,7 @@ UPROGS=\
 	_getParentIDtest\
 	_getChildrentest\
 	_getSyscallCounterTest\
+	_setPriorityTest\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
@@ -257,6 +258,7 @@ EXTRA=\
 	getParentIDtest.c\
 	getChildrentest.c\
 	getSyscallCounterTest.c\
+	setPriorityTest.c\
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
 

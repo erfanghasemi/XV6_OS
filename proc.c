@@ -141,6 +141,7 @@ userinit(void)
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
+  p->priority = 3;   // (Added)
 
   // this assignment to p->state lets other cores
   // run this process. the acquire forces the above
@@ -199,6 +200,7 @@ fork(void)
   np->sz = curproc->sz;
   np->parent = curproc;
   *np->tf = *curproc->tf;
+  np->priority = 3;
 
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
@@ -563,11 +565,35 @@ getChildren(char * ptr)
 
 // return occurrence of a syscall for current process (Added)
 int
-getSyscallCounter(int syscallNo){
-
+getSyscallCounter(int syscallNo)
+{
   struct proc *curproc = myproc();
   int occurrence;
 
   occurrence = curproc->syscall_occurrence[syscallNo-1];
   return occurrence;
+}
+
+// set or modify priority of current process (Added)
+int
+setPriority(int priority)
+{
+  struct proc *curproc = myproc();
+
+  if(priority > 6 || priority < 1)
+  {
+    curproc->priority = 5;
+    return 1;
+  }
+
+  curproc->priority = priority;
+  return 1;
+}
+
+// return priority of current process (Added)
+int
+getPriority(void)
+{
+  struct proc *curproc = myproc();
+  return curproc->priority;
 }

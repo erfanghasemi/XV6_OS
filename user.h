@@ -23,9 +23,11 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-int getparentid(void);          // (Added)
-int getChildren(char* ptr);     // (Added)
+int getparentid(void);                   // (Added)
+int getChildren(char* ptr);              // (Added)
 int getSyscallCounter(int syscallNo);    // (Added)
+int setPriority(int priority);           // (Added)
+int getPriority(void);                   // (Added)
 
 // ulib.c
 int stat(const char*, struct stat*);
