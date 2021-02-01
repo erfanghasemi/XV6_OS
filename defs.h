@@ -120,11 +120,13 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
-int             getparentid(void);                      // (Added)
-int             getChildren(char* ptr);                 // (Added)
-int             getSyscallCounter(int syscallNo);       // (Added)
-int             setPriority(int priority);              // (Added)
-int             getPriority(void);                      // (Added)
+int             getparentid(void);                                          // (Added)
+int             getChildren(char* ptr);                                     // (Added)
+int             getSyscallCounter(int syscallNo);                           // (Added)
+int             setPriority(int priority);                                  // (Added)
+int             getPriority(void);                                          // (Added)
+int             exec_process(struct proc* p, struct cpu* c);                // (Added)
+struct proc*    checkQueues(int *lastIndex, int *curPriority, char mode);   // (Added)
 
 // swtch.S
 void            swtch(struct context**, struct context*);

@@ -186,7 +186,8 @@ UPROGS=\
 	_getSyscallCounterTest\
 	_setPriorityTest\
 	_changePolicyTest\
-	_defaultSchedulingTest\
+	_defaultSchedTest\
+	_prioritySchedTest\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
@@ -261,7 +262,8 @@ EXTRA=\
 	getChildrentest.c\
 	getSyscallCounterTest.c\
 	setPriorityTest.c\
-	defaultSchedulingTest.c\
+	defaultSchedTest.c\
+	prioritySchedTest.c\
 	changePolicyTest.c\
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\

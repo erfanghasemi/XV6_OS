@@ -19,7 +19,6 @@ int nextpid = 1;
 extern void forkret(void);
 extern void trapret(void);
 
-int exec_process(struct proc* p, struct cpu* c);    // (Added)
 static void wakeup1(void *chan);
 
 void
@@ -329,7 +328,9 @@ scheduler(void)
   struct proc *p = 0;                         // (Modified)
   struct cpu *c = mycpu();
   c->proc = 0;
-  extern int curPolicy;
+  extern int curPolicy;                       // (Added)
+  int lastPriority = 0;                       // (Added)
+  int lastIndex[6] = {0};                     // (Added)
 
   for(;;){
     // Enable interrupts on this processor.
@@ -348,10 +349,15 @@ scheduler(void)
       break;
     
     case 1:       // Priority queues
-
+      p = checkQueues(lastIndex, &lastPriority, 'f');
+      if(p != 0)
+        exec_process(p, c);
       break;
 
     case 2:       // Reverse priority queues
+      p = checkQueues(lastIndex, &lastPriority, 'r');
+      if(p != 0)
+        exec_process(p, c);
       break;
 
     case 3:       // Round-Robin
@@ -544,9 +550,9 @@ procdump(void)
 }
 
 
-///////////////////METHODS///////////////////
+/////////////////// METHODS ///////////////////
 
-// excute selected process on cpu
+// excute selected process on cpu (Added)
 int
 exec_process(struct proc* p, struct cpu* c){
   // // Switch to chosen process.  It is the process's job
@@ -564,6 +570,76 @@ exec_process(struct proc* p, struct cpu* c){
   // // It should have changed its p->state before coming back.
   c->proc = 0;
   return 1;
+}
+
+// check every 6 queues and return high priority process (Added)
+struct proc*
+checkQueues(int *lastIndex, int *curPriority, char mode){
+  struct proc* selectedProc;
+  int priority = 0;
+
+  for(int j = 0; j < 6; j++){
+    if(mode == 'f')
+      priority = 1+j;
+    else if(mode == 'r')
+      priority = 6-j;
+    
+    // priority = (*curPriority + j) % 6 + 1;      // priority = 1 + j if we need every time start from 1 queue
+
+    for (int i = 0; i < 64; i++) {
+      switch(priority) {
+        case 1:
+          selectedProc = &ptable.proc[(lastIndex[0] + i) % 64];
+          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE) {
+            lastIndex[0] = (lastIndex[0] + 1 + i) % NPROC;
+            *curPriority = priority-1;
+            return selectedProc; 
+          }
+        
+        case 2:
+          selectedProc = &ptable.proc[(lastIndex[1] + i) % 64];
+          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE) {
+            lastIndex[1] = (lastIndex[1] + 1 + i) % NPROC;
+            *curPriority = priority-1;
+            return selectedProc;
+          }
+        
+        case 3:
+          selectedProc = &ptable.proc[(lastIndex[2] + i) % 64];
+          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE) {
+            lastIndex[2] = (lastIndex[2] + 1 + i) % NPROC;
+            *curPriority = priority-1;
+            return selectedProc;
+          }
+        
+        case 4:
+          selectedProc = &ptable.proc[(lastIndex[3] + i) % 64];
+          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE) {
+            lastIndex[3] = (lastIndex[3] + 1 + i) % NPROC;
+            *curPriority = priority-1;
+            return selectedProc;
+          }
+        
+        case 5:
+          selectedProc = &ptable.proc[(lastIndex[4] + i) % 64];
+          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE) {
+            lastIndex[4] = (lastIndex[4] + 1 + i) % NPROC;
+            *curPriority = priority-1;
+            return selectedProc;
+          }
+        
+        case 6:
+          selectedProc = &ptable.proc[(lastIndex[5] + i) % 64];
+          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE) {
+            lastIndex[5] = (lastIndex[5] + 1 + i) % NPROC;
+            *curPriority = priority-1;
+            return selectedProc;
+          }
+      }
+    }
+  }
+
+  return 0;
 }
 
 
