@@ -103,6 +103,9 @@ found:
   sp -= sizeof *p->tf;
   p->tf = (struct trapframe*)sp;
 
+  // set creation time (Added)
+  p->creationTime = ticks;
+
   // Set up new context to start executing at forkret,
   // which returns to trapret.
   sp -= 4;
@@ -237,6 +240,8 @@ exit(void)
   if(curproc == initproc)
     panic("init exiting");
 
+  curproc->terminationTime = ticks;         // set termination time (Added)
+
   // Close all open files.
   for(fd = 0; fd < NOFILE; fd++){
     if(curproc->ofile[fd]){
@@ -361,6 +366,11 @@ scheduler(void)
       break;
 
     case 3:       // Round-Robin
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->state != RUNNABLE)
+          continue;
+        exec_process(p, c);
+      }
       break;
 
     case 4:       // Multy layer Queue
@@ -642,6 +652,26 @@ checkQueues(int *lastIndex, int *curPriority, char mode){
   return 0;
 }
 
+// increase SLEEPING , RUNNABLE, RUNNING process (Added)
+void
+increase_time(void)
+{
+  struct proc *p;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  {
+    if (p->state == UNUSED)
+      continue;
+      
+    if (p->state == RUNNING)
+      p->runningTime++;
+
+    else if (p->state == SLEEPING)
+      p->sleepingTime++;
+
+    else if (p->state == RUNNABLE)
+      p->readyTime++;
+  }
+}
 
 ///////////////////ADDED SYSCALLS///////////////////
 

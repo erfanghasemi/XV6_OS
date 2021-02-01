@@ -127,6 +127,7 @@ int             setPriority(int priority);                                  // (
 int             getPriority(void);                                          // (Added)
 int             exec_process(struct proc* p, struct cpu* c);                // (Added)
 struct proc*    checkQueues(int *lastIndex, int *curPriority, char mode);   // (Added)
+void            increase_time(void);                                        // (Added)
 
 // swtch.S
 void            swtch(struct context**, struct context*);

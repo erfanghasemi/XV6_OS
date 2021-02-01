@@ -52,6 +52,11 @@ struct proc {
   char name[16];               // Process name (debugging)
   int syscall_occurrence[24];  // save occurrence of each syscall (Added)
   int priority;                // priority of a process (Added)
+  int creationTime;            // allocation time
+  int terminationTime;         // exit time
+  int runningTime;             // RUNNING state
+  int readyTime;               // RUNNABLE state
+  int sleepingTime;            // SLEEPING state
 };
 
 // Process memory is laid out contiguously, low addresses first:

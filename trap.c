@@ -51,6 +51,7 @@ trap(struct trapframe *tf)
     if(cpuid() == 0){
       acquire(&tickslock);
       ticks++;
+      increase_time();            // increase SLEEPING , RUNNABLE, RUNNING process (Added)
       wakeup(&ticks);
       release(&tickslock);
     }
