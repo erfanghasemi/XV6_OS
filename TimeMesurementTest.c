@@ -4,15 +4,13 @@
 Times *times;
 
 void
-AverageCBT(Times *times)
+averageCBT(Times *times)
 {
-    uint result = 0;
-    uint temp = 0;
+    int result = 0;
 
-    for (int i = 0; i < 10; i++){
-        temp = times[i].runningTime;
-        result += temp;
-        printf(1, "the CBT for process %d is: %x\n", i, temp);
+    for (int i = 0; i < 10; i++){       
+        result += times[i].runningTime;
+        printf(1, "the CBT for process %d is: %d\n", i, times[i].runningTime);
     }
 
     result /= 10;
@@ -21,36 +19,30 @@ AverageCBT(Times *times)
 }
 
 void
-AverageTurnArounTime(Times *times)
+averageTurnaroundTime(Times *times)
 {
-    uint result = 0;
-    uint temp;
+    int result = 0;
 
     for (int i = 0; i < 10; i++){
-        temp = (times[i].creationTime - times[i].terminationTime);
-        result += temp;
-        printf(1, "the turnAroundTime for process %d is: %d\n", i, temp);
+        result += times[i].runningTime + times[i].sleepingTime + times[i].readyTime;
+        printf(1, "the turnAroundTime for process %d is: %d\n", i, times[i].runningTime + times[i].sleepingTime + times[i].readyTime);
     }
         
-
     result /= 10;
 
     printf(1, "the average turnArounTime is: %d\n", result);
 }
 
 void
-AverageWaitingTime(Times *times)
+averageWaitingTime(Times *times)
 {
-    uint result = 0;
-    uint temp = 0;
+    int result = 0;
 
     for (int i = 0; i < 10; i++){
-        temp = (times[i].creationTime - times[i].runningTime - times[i].terminationTime);
-        result += temp;
-        printf(1, "the waitingTime for process %d is: %d\n", i, temp);
+        result += times[i].sleepingTime + times[i].readyTime;
+        printf(1, "the waitingTime for process %d is: %d\n", i, times[i].sleepingTime + times[i].readyTime);
     }
         
-
     result /= 10;
 
     printf(1, "the average WaitingTime is: %d\n", result);
@@ -79,9 +71,9 @@ main()
         wait2(&times[k]);
         
 
-     AverageCBT(times);
-     AverageTurnArounTime(times);
-     AverageWaitingTime(times);
+     averageCBT(times);
+     averageTurnaroundTime(times);
+     averageWaitingTime(times);
 
     exit();
 }

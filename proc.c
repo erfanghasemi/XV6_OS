@@ -105,7 +105,6 @@ found:
 
   // set creation time (Added)
   p->creationTime = ticks;
-  p->terminationTime = 0;
   p->sleepingTime = 0;
   p->runningTime = 0;
   p->readyTime = 0;
@@ -244,8 +243,6 @@ exit(void)
   if(curproc == initproc)
     panic("init exiting");
 
-  curproc->terminationTime = ticks;         // set termination time (Added)
-
   // Close all open files.
   for(fd = 0; fd < NOFILE; fd++){
     if(curproc->ofile[fd]){
@@ -275,6 +272,7 @@ exit(void)
 
   // Jump into the scheduler, never to return.
   curproc->state = ZOMBIE;
+
   sched();
   panic("zombie exit");
 }
@@ -661,6 +659,7 @@ void
 increase_time(void)
 {
   struct proc *p;
+  acquire(&ptable.lock);
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
   {
     if (p->state == UNUSED)
@@ -675,6 +674,7 @@ increase_time(void)
     else if (p->state == RUNNABLE)
       p->readyTime++;
   }
+  release(&ptable.lock);
 }
 
 ///////////////////ADDED SYSCALLS///////////////////
@@ -767,7 +767,6 @@ wait2(Times *times)
         times->readyTime = p->readyTime;
         times->runningTime = p->runningTime;
         times->sleepingTime = times->sleepingTime;
-        times->terminationTime = times->terminationTime;
         // done writing
 
         pid = p->pid;
