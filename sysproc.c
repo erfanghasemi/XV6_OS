@@ -164,3 +164,13 @@ sys_getPolicy(void)
 {
   return curPolicy;
 }
+
+// this wait syscall returns the related times for specifed process (Added)
+int 
+sys_wait2(void)
+{
+  Times *times;
+  if(argptr(1, (void*)&times, sizeof(*times)) < 0)
+    return -1;
+  return wait2(times);
+}

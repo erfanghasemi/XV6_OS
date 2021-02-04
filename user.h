@@ -30,6 +30,7 @@ int setPriority(int priority);           // (Added)
 int getPriority(void);                   // (Added)
 int changePolicy(int policy);            // (Added)
 int getPolicy(void);                     // (Added)
+int wait2(Times *times);                 // (Added)
 
 // ulib.c
 int stat(const char*, struct stat*);
