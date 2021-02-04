@@ -76,4 +76,5 @@ main()
      averageWaitingTime(times);
 
     exit();
+    return 1;
 }
