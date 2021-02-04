@@ -170,7 +170,7 @@ int
 sys_wait2(void)
 {
   Times *times;
-  if(argptr(1, (void*)&times, sizeof(*times)) < 0)
+  if(argptr(0, (void*)&times, sizeof(*times)) < 0)
     return -1;
   return wait2(times);
 }

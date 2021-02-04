@@ -105,6 +105,10 @@ found:
 
   // set creation time (Added)
   p->creationTime = ticks;
+  p->terminationTime = 0;
+  p->sleepingTime = 0;
+  p->runningTime = 0;
+  p->readyTime = 0;
 
   // Set up new context to start executing at forkret,
   // which returns to trapret.

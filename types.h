@@ -5,9 +5,9 @@ typedef uint pde_t;
 typedef struct times
 {
     /* data */
-  int creationTime;            // allocation time
-  int terminationTime;         // exit time
-  int runningTime;             // RUNNING state
-  int readyTime;               // RUNNABLE state
-  int sleepingTime;            // SLEEPING state
+  uint creationTime;            // allocation time
+  uint terminationTime;         // exit time
+  uint runningTime;             // RUNNING state
+  uint readyTime;               // RUNNABLE state
+  uint sleepingTime;            // SLEEPING state
 } Times;
