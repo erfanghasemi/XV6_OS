@@ -110,11 +110,7 @@ trap(struct trapframe *tf)
     { 
       if (multilayer == 1){
         curPolicy = 4;
-        if (q == 3){
-          q = 0;
-        } else {
-          q++;
-        }
+        q++;
       }                                                        
       yield();
     }
@@ -122,11 +118,7 @@ trap(struct trapframe *tf)
     {
       if (multilayer == 1){
         curPolicy = 4;
-        if (q == 3){
-          q = 0;
-        } else {
-          q++;
-        }
+        q++;
       }
       yield();
     }

@@ -13,8 +13,8 @@ struct cpu {
 int curPolicy;                  // shows that current scheduling policy (Added)
 extern struct cpu cpus[NCPU];
 extern int ncpu;
-int multilayer;
-int q;
+int multilayer;                 // (Added)
+int q;                          // (Added)
 
 //PAGEBREAK: 17
 // Saved registers for kernel context switches.

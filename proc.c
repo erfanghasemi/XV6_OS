@@ -338,14 +338,14 @@ int b = 1;
 void                                          // (Modified)
 scheduler(void)
 {
-  if (b == 1){
-    DefaultQ.size = 0;                          // (Added)
-    priSchedQ.size = 0;                         // (Added)
-    RpriSchedQ.size = 0;                       // (Added)
-    RoundRobinQ.size = 0;                       // (Added)
-    q = 0;
-    b = 0;
-  }
+  // if (b == 1){
+  //   DefaultQ.size = 0;                          // (Added)
+  //   priSchedQ.size = 0;                         // (Added)
+  //   RpriSchedQ.size = 0;                       // (Added)
+  //   RoundRobinQ.size = 0;                       // (Added)
+  //   q = 0;
+  //   b = 0;
+  // }
 
   multilayer = 0;                             //(Added)
   
@@ -392,37 +392,55 @@ scheduler(void)
       }
       break;
 
-    case 4:       // Multy layer Queue
+    case 4:       // Multilevel Queue
       multilayer = 1;
-      if (q == 1){
 
-        curPolicy = 3;
-        for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-        if(p->state != RUNNABLE)
-          continue;
-        exec_process(p, c); 
-        }
-      } else if (q == 2){
-
-        curPolicy = 1;
-        p = checkQueues(lastIndex, &lastPriority, 'f');
-         if(p != 0)
-        exec_process(p, c);
-
-      } else if (q == 3){
-
-        curPolicy = 2;
-        p = checkQueues(lastIndex, &lastPriority, 'r');
-        if(p != 0)
-          exec_process(p, c);
-
-      } else {
-
+      if(q % 4 == 0)
+      {
         curPolicy = 0;
-        for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-        if(p->state != RUNNABLE)
-          continue;
-        exec_process(p, c);
+        for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+        {
+          if(p->state != RUNNABLE || p->queue != 0)
+            continue;
+          exec_process(p, c);
+        }
+      }
+
+      else if (q % 4 == 1)
+      {
+        curPolicy = 3;
+        for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+        {
+          if(p->state != RUNNABLE || p->queue != 1)
+            continue;
+          exec_process(p, c); 
+        }
+      } 
+      
+      else if (q % 4 == 2){
+        curPolicy = 1;
+        for(;;)
+        {
+          p = checkQueues(lastIndex, &lastPriority, 'f');
+          if(p != 0 && p->queue == 2)
+          {
+            exec_process(p, c);
+            break;
+          }  
+        }
+      }
+
+      else if (q % 4 == 3)
+      {
+        curPolicy = 2;
+        for(;;)
+        {
+          p = checkQueues(lastIndex, &lastPriority, 'r');
+          if(p != 0 && p->queue == 3)
+          {
+            exec_process(p, c);
+            break;
+          }  
         }
       }
       break;
@@ -725,7 +743,6 @@ increase_time(void)
   }
   release(&ptable.lock);
 }
-
 
 
 ///////////////////ADDED SYSCALLS///////////////////
