@@ -189,6 +189,7 @@ UPROGS=\
 	_roundRobinTest\
 	_prioritySchedTest\
 	_TimeMesurementTest\
+	_multiLayeredQueuedTest\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
@@ -269,6 +270,7 @@ EXTRA=\
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
 	TimeMesurementTest.c\
+	multiLayeredQueuedTest.c\
 
 dist:
 	rm -rf dist
