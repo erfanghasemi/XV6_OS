@@ -107,11 +107,27 @@ trap(struct trapframe *tf)
      tf->trapno == T_IRQ0+IRQ_TIMER)
   {                                                         // (Modified)
     if (curPolicy == 0 || curPolicy == 1 || curPolicy == 2) 
-    {                                                         
+    { 
+      if (multilayer == 1){
+        curPolicy = 4;
+        if (q == 3){
+          q = 0;
+        } else {
+          q++;
+        }
+      }                                                        
       yield();
     }
     else if (curPolicy == 3 && ticks % QUANTUM == 0)        // for Round-Robin (Added)
     {
+      if (multilayer == 1){
+        curPolicy = 4;
+        if (q == 3){
+          q = 0;
+        } else {
+          q++;
+        }
+      }
       yield();
     }
   }

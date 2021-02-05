@@ -13,6 +13,8 @@ struct cpu {
 int curPolicy;                  // shows that current scheduling policy (Added)
 extern struct cpu cpus[NCPU];
 extern int ncpu;
+int multilayer;
+int q;
 
 //PAGEBREAK: 17
 // Saved registers for kernel context switches.
@@ -52,11 +54,11 @@ struct proc {
   char name[16];               // Process name (debugging)
   int syscall_occurrence[24];  // save occurrence of each syscall (Added)
   int priority;                // priority of a process (Added)
-  int creationTime;            // allocation time
-  int runningTime;             // RUNNING state
-  int readyTime;               // RUNNABLE state
-  int sleepingTime;            // SLEEPING state
-  int queue;                   // number of queue that the process belons to
+  int creationTime;            // allocation time (Added)
+  int runningTime;             // RUNNING state (Added)
+  int readyTime;               // RUNNABLE state (Added)
+  int sleepingTime;            // SLEEPING state (Added)
+  int queue;                   // number of queue that the process belongs to it (Added)
 };
 
 // Process memory is laid out contiguously, low addresses first:
@@ -64,3 +66,32 @@ struct proc {
 //   original data and bss
 //   fixed-size stack
 //   expandable heap
+
+// structs for multilevel queue (Added)
+typedef struct rr 
+{
+  struct proc* queu[NPROC];
+  int size;
+
+} RoundRobin;
+
+typedef struct d
+{
+  struct proc* queu[NPROC];
+  int size;
+
+} Default;
+
+typedef struct prio
+{
+  struct proc* queu[NPROC];
+  int size;
+
+} PrioritySchedualing;
+
+typedef struct reversePrio
+{
+  struct proc* queu[NPROC];
+  int size;
+
+} ReversePrioritySchedualing;

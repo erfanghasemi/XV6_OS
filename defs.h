@@ -129,7 +129,7 @@ int             exec_process(struct proc* p, struct cpu* c);                // (
 struct proc*    checkQueues(int *lastIndex, int *curPriority, char mode);   // (Added)
 void            increase_time(void);                                        // (Added)
 int             wait2(Times *times);                                        // (Added)
-int             enQueue(int pid);                                           // (Added)
+int             enQueue(int queue);                                         // (Added)
 
 // swtch.S
 void            swtch(struct context**, struct context*);

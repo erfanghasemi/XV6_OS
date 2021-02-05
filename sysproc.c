@@ -8,6 +8,8 @@
 #include "proc.h"
 
 extern int curPolicy;                  // shows that current scheduling policy (Added)
+extern int multilayer;
+extern int q;
 
 int
 sys_fork(void)
@@ -175,11 +177,12 @@ sys_wait2(void)
   return wait2(times);
 }
 
+// this function add current process to given queue (Added)
 int
 sys_enQueue(void)
 {
-  int pid;
-  if(argint(0, &pid) < 0)
+  int queue;
+  if(argint(0, &queue) < 0)
     return -1;
-  return enQueue(pid);
+  return enQueue(queue);
 }

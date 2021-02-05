@@ -12,46 +12,10 @@ struct {
   struct proc proc[NPROC];
 } ptable;
 
-                    ///  // added structs/////
-typedef struct rr
-{
-  /* data */
-  struct proc queu[NPROC];
-  int size;
-
-} RoundRobin;
-
-RoundRobin RoundRobinQ;
-
-typedef struct d
-{
-  /* data */
-  struct proc queu[NPROC];
-  int size;
-
-} Default;
-
-Default DefaultQ;
-
-typedef struct prio
-{
-  /* data */
-  struct proc queu[NPROC];
-  int size;
-
-} PrioritySchedualing;
-
-PrioritySchedualing priSchedQ;
-
-typedef struct reversePrio
-{
-  /* data */
-  struct proc queu[NPROC];
-  int size;
-
-} ReversePrioritySchedualing;
-
-ReversePrioritySchedualing RpriSchedQ;
+RoundRobin RoundRobinQ;                     // (Added)
+Default DefaultQ;                           // (Added)
+PrioritySchedualing priSchedQ;              // (Added)
+ReversePrioritySchedualing RpriSchedQ;      // (Added)
 
 static struct proc *initproc;
 
@@ -370,13 +334,21 @@ wait(void)
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
+int b = 1;
 void                                          // (Modified)
 scheduler(void)
 {
-  DefaultQ.size = 0;                          // (Added)
-  priSchedQ.size = 0;                         // (Added)
-  RpriSchedQ.size = 0;                       // (Added)
-  RoundRobinQ.size = 0;                       // (Added)
+  if (b == 1){
+    DefaultQ.size = 0;                          // (Added)
+    priSchedQ.size = 0;                         // (Added)
+    RpriSchedQ.size = 0;                       // (Added)
+    RoundRobinQ.size = 0;                       // (Added)
+    q = 0;
+    b = 0;
+  }
+
+  multilayer = 0;                             //(Added)
+  
   struct proc *p = 0;                         // (Modified)
   struct cpu *c = mycpu();
   c->proc = 0;
@@ -421,6 +393,38 @@ scheduler(void)
       break;
 
     case 4:       // Multy layer Queue
+      multilayer = 1;
+      if (q == 1){
+
+        curPolicy = 3;
+        for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->state != RUNNABLE)
+          continue;
+        exec_process(p, c); 
+        }
+      } else if (q == 2){
+
+        curPolicy = 1;
+        p = checkQueues(lastIndex, &lastPriority, 'f');
+         if(p != 0)
+        exec_process(p, c);
+
+      } else if (q == 3){
+
+        curPolicy = 2;
+        p = checkQueues(lastIndex, &lastPriority, 'r');
+        if(p != 0)
+          exec_process(p, c);
+
+      } else {
+
+        curPolicy = 0;
+        for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->state != RUNNABLE)
+          continue;
+        exec_process(p, c);
+        }
+      }
       break;
     }
 
@@ -810,10 +814,10 @@ wait2(Times *times)
         // Found one.
 
         // writing the related times (Added)
+        times->sleepingTime = times->sleepingTime;
         times->creationTime = p->creationTime;
         times->readyTime = p->readyTime;
         times->runningTime = p->runningTime;
-        times->sleepingTime = times->sleepingTime;
         // done writing
 
         pid = p->pid;
@@ -841,34 +845,35 @@ wait2(Times *times)
   }
 }
 
+// this function add current process to given queue (Added)
 int
-enQueue(int pid)
+enQueue(int queue)
 {
-  struct proc p;
+  struct proc *curproc = myproc();
 
-  for (int i = 0; i < NPROC; i++){
-    if (ptable.proc[i].pid == pid){
-      p = ptable.proc[i];
-    }
-  }
-
-  if (p.queue == 1){
-    RoundRobinQ.queu[RoundRobinQ.size] = p;
+  if (queue == 1)
+  {
+    RoundRobinQ.queu[RoundRobinQ.size] = curproc;
+    curproc->queue = queue;
     RoundRobinQ.size++;
-
-  } else if (p.queue == 2){
-    priSchedQ.queu[priSchedQ.size] = p;
-    priSchedQ.size++;
-
-  } else if (p.queue == 3){
-    RpriSchedQ.queu[RpriSchedQ.size] = p;
-    RpriSchedQ.size++;
-
-  } else {
-    DefaultQ.queu[DefaultQ.size] = p;
-    DefaultQ.size++;
-
   }
-
+  else if (queue == 2)
+  {
+    priSchedQ.queu[priSchedQ.size] = curproc;
+    curproc->queue = queue;
+    priSchedQ.size++;
+  }
+  else if (queue == 3)
+  {
+    RpriSchedQ.queu[RpriSchedQ.size] = curproc;
+    curproc->queue = queue;
+    RpriSchedQ.size++;
+  }
+  else 
+  {
+    DefaultQ.queu[DefaultQ.size] = curproc;
+    curproc->queue = queue;
+    DefaultQ.size++;
+  }
   return 1;
 }
