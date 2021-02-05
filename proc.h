@@ -56,6 +56,7 @@ struct proc {
   int runningTime;             // RUNNING state
   int readyTime;               // RUNNABLE state
   int sleepingTime;            // SLEEPING state
+  int queue;                   // number of queue that the process belons to
 };
 
 // Process memory is laid out contiguously, low addresses first:

@@ -174,3 +174,12 @@ sys_wait2(void)
     return -1;
   return wait2(times);
 }
+
+int
+sys_enQueue(void)
+{
+  int pid;
+  if(argint(0, &pid) < 0)
+    return -1;
+  return enQueue(pid);
+}

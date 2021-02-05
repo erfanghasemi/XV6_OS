@@ -31,6 +31,7 @@ int getPriority(void);                   // (Added)
 int changePolicy(int policy);            // (Added)
 int getPolicy(void);                     // (Added)
 int wait2(Times *times);                 // (Added)
+int enQueue(int pid);                    // (Added)
 
 // ulib.c
 int stat(const char*, struct stat*);

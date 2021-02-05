@@ -28,3 +28,4 @@
 #define SYS_changePolicy 27             // (Added)
 #define SYS_getPolicy 28                // (Added)
 #define SYS_wait2 29                    // (Added)
+#define SYS_enQueue 30                  // (Added)

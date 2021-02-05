@@ -12,6 +12,47 @@ struct {
   struct proc proc[NPROC];
 } ptable;
 
+                    ///  // added structs/////
+typedef struct rr
+{
+  /* data */
+  struct proc queu[NPROC];
+  int size;
+
+} RoundRobin;
+
+RoundRobin RoundRobinQ;
+
+typedef struct d
+{
+  /* data */
+  struct proc queu[NPROC];
+  int size;
+
+} Default;
+
+Default DefaultQ;
+
+typedef struct prio
+{
+  /* data */
+  struct proc queu[NPROC];
+  int size;
+
+} PrioritySchedualing;
+
+PrioritySchedualing priSchedQ;
+
+typedef struct reversePrio
+{
+  /* data */
+  struct proc queu[NPROC];
+  int size;
+
+} ReversePrioritySchedualing;
+
+ReversePrioritySchedualing RpriSchedQ;
+
 static struct proc *initproc;
 
 int nextpid = 1;
@@ -332,6 +373,10 @@ wait(void)
 void                                          // (Modified)
 scheduler(void)
 {
+  DefaultQ.size = 0;                          // (Added)
+  priSchedQ.size = 0;                         // (Added)
+  RpriSchedQ.size = 0;                       // (Added)
+  RoundRobinQ.size = 0;                       // (Added)
   struct proc *p = 0;                         // (Modified)
   struct cpu *c = mycpu();
   c->proc = 0;
@@ -677,6 +722,8 @@ increase_time(void)
   release(&ptable.lock);
 }
 
+
+
 ///////////////////ADDED SYSCALLS///////////////////
 
 
@@ -792,4 +839,36 @@ wait2(Times *times)
     // Wait for children to exit.  (See wakeup1 call in proc_exit.)
     sleep(curproc, &ptable.lock);  //DOC: wait-sleep
   }
+}
+
+int
+enQueue(int pid)
+{
+  struct proc p;
+
+  for (int i = 0; i < NPROC; i++){
+    if (ptable.proc[i].pid == pid){
+      p = ptable.proc[i];
+    }
+  }
+
+  if (p.queue == 1){
+    RoundRobinQ.queu[RoundRobinQ.size] = p;
+    RoundRobinQ.size++;
+
+  } else if (p.queue == 2){
+    priSchedQ.queu[priSchedQ.size] = p;
+    priSchedQ.size++;
+
+  } else if (p.queue == 3){
+    RpriSchedQ.queu[RpriSchedQ.size] = p;
+    RpriSchedQ.size++;
+
+  } else {
+    DefaultQ.queu[DefaultQ.size] = p;
+    DefaultQ.size++;
+
+  }
+
+  return 1;
 }
