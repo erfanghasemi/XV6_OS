@@ -111,7 +111,7 @@ extern int sys_getPriority(void);           // (Added)
 extern int sys_changePolicy(void);          // (Added)
 extern int sys_getPolicy(void);             // (Added)
 extern int sys_wait2(void);                 // (Added)
-extern int sys_enQueue(void);               // (Added)
+extern int sys_fork2(void);                 // (Added)
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -143,7 +143,7 @@ static int (*syscalls[])(void) = {
 [SYS_changePolicy]    sys_changePolicy,           // (Added)
 [SYS_getPolicy]       sys_getPolicy,              // (Added) 
 [SYS_wait2]           sys_wait2,                  // (Added)
-[SYS_enQueue]         sys_enQueue,                // (Added)
+[SYS_fork2]         sys_fork2,                    // (Added)
 };
 
 void

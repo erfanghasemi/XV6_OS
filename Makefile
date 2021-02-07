@@ -166,30 +166,29 @@ mkfs: mkfs.c fs.h
 .PRECIOUS: %.o
 
 UPROGS=\
-	_cat\
-	_echo\
-	_forktest\
-	_grep\
-	_init\
-	_kill\
-	_ln\
-	_ls\
-	_mkdir\
-	_rm\
-	_sh\
-	_stressfs\
-	_usertests\
-	_wc\
-	_zombie\
-	_getParentIDtest\
-	_getChildrentest\
-	_getSyscallCounterTest\
-	_setPriorityTest\
-	_changePolicyTest\
-	_roundRobinTest\
-	_prioritySchedTest\
-	_TimeMesurementTest\
-	_multiLayeredQueuedTest\
+		_cat\
+		_echo\
+		_forktest\
+		_grep\
+		_init\
+		_kill\
+		_ln\
+		_ls\
+		_mkdir\
+		_rm\
+		_sh\
+		_stressfs\
+		_usertests\
+		_wc\
+		_zombie\
+		_getParentIDtest\
+		_getChildrentest\
+		_getSyscallCounterTest\
+		_setPriorityTest\
+		_roundRobinTest\
+		_prioritySchedTest\
+		_TimeMesurementTest\
+		_multiLevelSchedTest\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
@@ -266,11 +265,11 @@ EXTRA=\
 	setPriorityTest.c\
 	roundRobinTest.c\
 	prioritySchedTest.c\
-	changePolicyTest.c\
+	TimeMesurementTest.c\
+	multiLevelSchedTest.c\
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
-	TimeMesurementTest.c\
-	multiLayeredQueuedTest.c\
+	
 
 dist:
 	rm -rf dist

@@ -52,13 +52,14 @@ averageWaitingTime(Times *times)
 int
 main()
 {   
+
     times = (Times *) malloc(10 * sizeof(Times));
     changePolicy(3);
 
     int i, j, k;
     
     for (i = 0; i < 10; i++)
-    {
+    {   
         if (fork() == 0)
         {
             for (j = 1; j < 1000; j++)

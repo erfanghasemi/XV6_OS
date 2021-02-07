@@ -154,9 +154,10 @@ int
 sys_changePolicy(void)
 {
   int policy;
+  
   if(argint(0, &policy) < 0)
     return -1;
-  curPolicy = policy;
+  curPolicy = policy; 
   return 1;
 }
 
@@ -179,10 +180,10 @@ sys_wait2(void)
 
 // this function add current process to given queue (Added)
 int
-sys_enQueue(void)
+sys_fork2(void)
 {
   int queue;
   if(argint(0, &queue) < 0)
     return -1;
-  return enQueue(queue);
+  return fork2(queue);
 }

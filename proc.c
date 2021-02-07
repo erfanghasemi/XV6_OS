@@ -12,11 +12,6 @@ struct {
   struct proc proc[NPROC];
 } ptable;
 
-RoundRobin RoundRobinQ;                     // (Added)
-Default DefaultQ;                           // (Added)
-PrioritySchedualing priSchedQ;              // (Added)
-ReversePrioritySchedualing RpriSchedQ;      // (Added)
-
 static struct proc *initproc;
 
 int nextpid = 1;
@@ -202,6 +197,7 @@ fork(void)
     return -1;
   }
 
+  
   // Copy process state from proc.
   if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0){
     kfree(np->kstack);
@@ -334,32 +330,22 @@ wait(void)
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
-int b = 1;
 void                                          // (Modified)
 scheduler(void)
-{
-  // if (b == 1){
-  //   DefaultQ.size = 0;                          // (Added)
-  //   priSchedQ.size = 0;                         // (Added)
-  //   RpriSchedQ.size = 0;                       // (Added)
-  //   RoundRobinQ.size = 0;                       // (Added)
-  //   q = 0;
-  //   b = 0;
-  // }
-
-  multilayer = 0;                             //(Added)
-  
-  struct proc *p = 0;                         // (Modified)
+{  
+  struct proc *p;                         // (Modified)
   struct cpu *c = mycpu();
   c->proc = 0;
+
   extern int curPolicy;                       // (Added)
+  extern int curLevel;                        // (Added)
   int lastPriority = 0;                       // (Added)
   int lastIndex[6] = {0};                     // (Added)
 
   for(;;){
     // Enable interrupts on this processor.
     sti();
-
+  
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
     switch (curPolicy)
@@ -373,79 +359,94 @@ scheduler(void)
       break;
     
     case 1:       // Priority queues
-      p = checkQueues(lastIndex, &lastPriority, 'f');
+      p = checkQueues(lastIndex, &lastPriority, 'f', 0);
       if(p != 0)
-        exec_process(p, c);
-      break;
-
-    case 2:       // Reverse priority queues
-      p = checkQueues(lastIndex, &lastPriority, 'r');
-      if(p != 0)
-        exec_process(p, c);
-      break;
-
-    case 3:       // Round-Robin
-      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-        if(p->state != RUNNABLE)
-          continue;
+      {
         exec_process(p, c);
       }
       break;
 
-    case 4:       // Multilevel Queue
-      multilayer = 1;
-
-      if(q % 4 == 0)
+    case 2:       // Reverse priority queues
+      p = checkQueues(lastIndex, &lastPriority, 'r', 0);
+      if(p != 0)
       {
-        curPolicy = 0;
+        exec_process(p, c);
+      }
+      break;
+
+    case 3:       // Round-Robin
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->state == RUNNABLE)
+        {
+          exec_process(p, c);
+        }
+      }
+      break;
+
+    case 4:       // Multilevel Queue
+      if(curLevel % 4 == 0)
+      { 
         for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
         {
           if(p->state != RUNNABLE || p->queue != 0)
             continue;
           exec_process(p, c);
+          break;
         }
       }
 
-      else if (q % 4 == 1)
-      {
-        curPolicy = 3;
+      curLevel++;  
+
+      if (curLevel % 4 == 1)
+      {   
+          p = checkQueues(lastIndex, &lastPriority, 'f', 1);
+          if(p != 0)
+          { 
+            exec_process(p, c);
+          }
+      }
+
+      curLevel++;  
+      lastPriority = 0; 
+      lastIndex[0] = 0;
+      lastIndex[1] = 0;
+      lastIndex[2] = 0;
+      lastIndex[3] = 0;
+      lastIndex[4] = 0;
+      lastIndex[5] = 0;
+
+      if (curLevel % 4 == 2)
+      {   
+          p = checkQueues(lastIndex, &lastPriority, 'r', 2);
+          if(p != 0)
+          { 
+            exec_process(p, c);
+          }          
+      }
+
+      curLevel++;  
+      lastPriority = 0; 
+      lastIndex[0] = 0;
+      lastIndex[1] = 0;
+      lastIndex[2] = 0;
+      lastIndex[3] = 0;
+      lastIndex[4] = 0;
+      lastIndex[5] = 0;
+
+      if(curLevel % 4 == 3)
+      { 
         for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-        {
-          if(p->state != RUNNABLE || p->queue != 1)
+        { 
+          if(p->state != RUNNABLE)
             continue;
-          exec_process(p, c); 
-        }
-      } 
-      
-      else if (q % 4 == 2){
-        curPolicy = 1;
-        for(;;)
-        {
-          p = checkQueues(lastIndex, &lastPriority, 'f');
-          if(p != 0 && p->queue == 2)
-          {
-            exec_process(p, c);
-            break;
-          }  
-        }
+          exec_process(p, c);
+          break;
+        }   
       }
 
-      else if (q % 4 == 3)
-      {
-        curPolicy = 2;
-        for(;;)
-        {
-          p = checkQueues(lastIndex, &lastPriority, 'r');
-          if(p != 0 && p->queue == 3)
-          {
-            exec_process(p, c);
-            break;
-          }  
-        }
-      }
+      curLevel++;  
       break;
     }
-
     release(&ptable.lock);
   }
 }
@@ -480,7 +481,7 @@ sched(void)
 void
 yield(void)
 {
-  acquire(&ptable.lock);  //DOC: yieldlock
+  acquire(&ptable.lock);  //DOC: yieldlock  
   myproc()->state = RUNNABLE;
   sched();
   release(&ptable.lock);
@@ -653,23 +654,25 @@ exec_process(struct proc* p, struct cpu* c){
 
 // check every 6 queues and return high priority process (Added)
 struct proc*
-checkQueues(int *lastIndex, int *curPriority, char mode){
+checkQueues(int *lastIndex, int *curPriority, char mode, int queue){
   struct proc* selectedProc;
   int priority = 0;
+
 
   for(int j = 0; j < 6; j++){
     if(mode == 'f')
       priority = 1+j;
+
     else if(mode == 'r')
       priority = 6-j;
     
     // priority = (*curPriority + j) % 6 + 1;      // priority = 1 + j if we need every time start from 1 queue
-
+  
     for (int i = 0; i < 64; i++) {
       switch(priority) {
         case 1:
           selectedProc = &ptable.proc[(lastIndex[0] + i) % 64];
-          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE) {
+          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE && selectedProc->queue == queue) {
             lastIndex[0] = (lastIndex[0] + 1 + i) % NPROC;
             *curPriority = priority-1;
             return selectedProc; 
@@ -677,7 +680,7 @@ checkQueues(int *lastIndex, int *curPriority, char mode){
         
         case 2:
           selectedProc = &ptable.proc[(lastIndex[1] + i) % 64];
-          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE) {
+          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE && selectedProc->queue == queue) {
             lastIndex[1] = (lastIndex[1] + 1 + i) % NPROC;
             *curPriority = priority-1;
             return selectedProc;
@@ -685,7 +688,7 @@ checkQueues(int *lastIndex, int *curPriority, char mode){
         
         case 3:
           selectedProc = &ptable.proc[(lastIndex[2] + i) % 64];
-          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE) {
+          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE && selectedProc->queue == queue) {
             lastIndex[2] = (lastIndex[2] + 1 + i) % NPROC;
             *curPriority = priority-1;
             return selectedProc;
@@ -693,7 +696,7 @@ checkQueues(int *lastIndex, int *curPriority, char mode){
         
         case 4:
           selectedProc = &ptable.proc[(lastIndex[3] + i) % 64];
-          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE) {
+          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE && selectedProc->queue == queue) {
             lastIndex[3] = (lastIndex[3] + 1 + i) % NPROC;
             *curPriority = priority-1;
             return selectedProc;
@@ -701,7 +704,7 @@ checkQueues(int *lastIndex, int *curPriority, char mode){
         
         case 5:
           selectedProc = &ptable.proc[(lastIndex[4] + i) % 64];
-          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE) {
+          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE && selectedProc->queue == queue) {
             lastIndex[4] = (lastIndex[4] + 1 + i) % NPROC;
             *curPriority = priority-1;
             return selectedProc;
@@ -709,7 +712,7 @@ checkQueues(int *lastIndex, int *curPriority, char mode){
         
         case 6:
           selectedProc = &ptable.proc[(lastIndex[5] + i) % 64];
-          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE) {
+          if (selectedProc->priority == priority && selectedProc->state == RUNNABLE  && selectedProc->queue == queue) {
             lastIndex[5] = (lastIndex[5] + 1 + i) % NPROC;
             *curPriority = priority-1;
             return selectedProc;
@@ -862,35 +865,50 @@ wait2(Times *times)
   }
 }
 
-// this function add current process to given queue (Added)
+// this function fork process to given queue (Added)
 int
-enQueue(int queue)
+fork2(int queue)
 {
+  int i, pid;
+  struct proc *np;
   struct proc *curproc = myproc();
 
-  if (queue == 1)
-  {
-    RoundRobinQ.queu[RoundRobinQ.size] = curproc;
-    curproc->queue = queue;
-    RoundRobinQ.size++;
+  // Allocate process.
+  if((np = allocproc()) == 0){
+    return -1;
   }
-  else if (queue == 2)
-  {
-    priSchedQ.queu[priSchedQ.size] = curproc;
-    curproc->queue = queue;
-    priSchedQ.size++;
+
+  np->queue = queue;            // (Added)
+  
+  // Copy process state from proc.
+  if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0){
+    kfree(np->kstack);
+    np->kstack = 0;
+    np->state = UNUSED;
+    return -1;
   }
-  else if (queue == 3)
-  {
-    RpriSchedQ.queu[RpriSchedQ.size] = curproc;
-    curproc->queue = queue;
-    RpriSchedQ.size++;
-  }
-  else 
-  {
-    DefaultQ.queu[DefaultQ.size] = curproc;
-    curproc->queue = queue;
-    DefaultQ.size++;
-  }
-  return 1;
+  np->sz = curproc->sz;
+  np->parent = curproc;
+  *np->tf = *curproc->tf;
+  np->priority = 3;
+
+  // Clear %eax so that fork returns 0 in the child.
+  np->tf->eax = 0;
+
+  for(i = 0; i < NOFILE; i++)
+    if(curproc->ofile[i])
+      np->ofile[i] = filedup(curproc->ofile[i]);
+  np->cwd = idup(curproc->cwd);
+
+  safestrcpy(np->name, curproc->name, sizeof(curproc->name));
+
+  pid = np->pid;
+
+  acquire(&ptable.lock);
+
+  np->state = RUNNABLE;
+
+  release(&ptable.lock);
+
+  return pid;
 }

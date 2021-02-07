@@ -13,8 +13,8 @@ struct cpu {
 int curPolicy;                  // shows that current scheduling policy (Added)
 extern struct cpu cpus[NCPU];
 extern int ncpu;
-int multilayer;                 // (Added)
-int q;                          // (Added)
+int curLevel;                          // (Added)
+
 
 //PAGEBREAK: 17
 // Saved registers for kernel context switches.
@@ -67,31 +67,3 @@ struct proc {
 //   fixed-size stack
 //   expandable heap
 
-// structs for multilevel queue (Added)
-typedef struct rr 
-{
-  struct proc* queu[NPROC];
-  int size;
-
-} RoundRobin;
-
-typedef struct d
-{
-  struct proc* queu[NPROC];
-  int size;
-
-} Default;
-
-typedef struct prio
-{
-  struct proc* queu[NPROC];
-  int size;
-
-} PrioritySchedualing;
-
-typedef struct reversePrio
-{
-  struct proc* queu[NPROC];
-  int size;
-
-} ReversePrioritySchedualing;

@@ -1,6 +1,13 @@
 {
     "files.associations": {
         "*.tcc": "c",
-        "cstdio": "c"
+        "cstdio": "c",
+        "random": "c",
+        "param.h": "c",
+        "proc.h": "c",
+        "spinlock.h": "c",
+        "types.h": "c",
+        "memory": "c",
+        "memlayout.h": "c"
     }
 }
